@@ -40,9 +40,9 @@ class Color {
 	}
 
 	public static function fromRgb(float $r, float $g, float $b) {
-		$r = max(0, min(255, $r));
-		$g = max(0, min(255, $g));
-		$b = max(0, min(255, $b));
+		$r = max(0, min(1, $r));
+		$g = max(0, min(1, $g));
+		$b = max(0, min(1, $b));
 		$cMin = min($r, $g, $b);
 		$cMax = max($r, $g, $b);
 		// necessary for color conversion
@@ -109,9 +109,9 @@ class Color {
 	}
 
 	public static function luminanceFromRgb(float $r, float $g, float $b) {
-		$r = Color::luminanceColor($r);
-		$g = Color::luminanceColor($g);
-		$b = Color::luminanceColor($b);
+		$r = Color::luminanceColor(round($r * 255) / 255);
+		$g = Color::luminanceColor(round($g * 255) / 255);
+		$b = Color::luminanceColor(round($b * 255) / 255);
 
 		return 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
 	}
@@ -212,7 +212,11 @@ class Color {
 
 	// shorthand for rgbToHex
 	public function toHex() {
-		return Color::rgbToHex($this->red * 255, $this->green * 255, $this->blue * 255);
+		return Color::rgbToHex(
+			round($this->red * 255), 
+			round($this->green * 255), 
+			round($this->blue * 255)
+		);
 	}
 	
 	// shorthand for rgbToString
@@ -227,6 +231,43 @@ class Color {
 		return $contrast;
 	}
 
+	public static function pairSuggestion($c1, $c2, $lum, $sat, $lum2, $sat2, $conFn, $doSat = false) {
+		$lum1 = $c1->luminance();
+		$lum2 = $c2->luminance();
+		$contrast = Color::contrast($lum1, $lum2);
+		$l = $lum;
+		$s = $sat;
+		$l2 = $lum2;
+		$s2 = $sat2;
+		$dir = $lum1 > $lum2 ? 1 : -1;
+		while ($contrast < 7.5) {
+			if ($doSat) { 
+				$s -= 0.01;
+				$s2 -= 0.01;
+			}
+			$l += $dir * 0.02;
+			$l2 -= $dir * 0.02;
+
+			$rgb = call_user_func("Color::" . $conFn, $c1->hue, $s, $l);
+			$c1 = Color::fromRgb($rgb["red"], $rgb["green"], $rgb["blue"]);
+			$lum1 = $c1->luminance();
+
+			$rgb2 = call_user_func("Color::" . $conFn, $c2->hue, $s2, $l2);
+			$c2 = Color::fromRgb($rgb2["red"], $rgb2["green"], $rgb2["blue"]);
+			$lum2 = $c2->luminance();
+
+			$contrast = Color::contrast($lum1, $lum2);
+			if ($doSat) {
+				if ($s < 0 || $s > 1) return null;
+			}
+			else if ($l < 0 || $l > 1) {
+				return Color::makeSuggestion($c1, $c2, $lum, $s, $conFn, true);
+			}
+		}
+
+		return [$c1, $c2];
+	}
+
 	public static function makeSuggestion($c1, $c2, $lum, $sat, $conFn, $doSat = false) {
 		$lum1 = $c1->luminance();
 		$lum2 = $c2->luminance();
@@ -234,9 +275,9 @@ class Color {
 		$l = $lum;
 		$s = $sat;
 		$dir = $lum1 > $lum2 ? 1 : -1;
-		while ($contrast < 7) {
-			if ($doSat) $s -= 0.05;
-			$l += $dir * 0.1;
+		while ($contrast < 7.5) {
+			if ($doSat) $s -= 0.025;
+			$l += $dir * 0.05;
 			$rgb = call_user_func("Color::" . $conFn, $c1->hue, $s, $l);
 			$c1 = Color::fromRgb($rgb["red"], $rgb["green"], $rgb["blue"]);
 			$lum1 = $c1->luminance();
@@ -246,16 +287,15 @@ class Color {
 			}
 			else if ($l < 0 || $l > 1) {
 				return Color::makeSuggestion($c1, $c2, $lum, $s, $conFn, true);
-			};
+			}
 		}
-		print_r($contrast . "<br>");
 		return $c1;
 	}
 
 	// how good is contrast between the two colors?
 	// shift colour until contrast is ~7
 	// repeat for all color spaces
-	public static function suggestColors($c1, $c2) {
+	public static function suggestColors($c1, $c2, $pair = false) {
 		$lum1 = Color::luminanceFromRgb($c1->red, $c1->green, $c1->blue);
 		$lum2 = Color::luminanceFromRgb($c2->red, $c2->green, $c2->blue);
 		$con = Color::contrast($lum1, $lum2);
@@ -270,11 +310,22 @@ class Color {
 				$luminances = [$c->luma, $c->intensity, $c->value, $c->light];
 				$saturations = [$c->chroma, $c->hsi_saturation,
 					$c->hsv_saturation, $c->hsl_saturation];
+				$bgLuminances = [$cBg->luma, $cBg->intensity, $cBg->value, $cBg->light];
+				$bgSaturations = [$cBg->chroma, $cBg->hsi_saturation,
+					$cBg->hsv_saturation, $cBg->hsl_saturation];
 				$conFunctions = ["hclToRgb", "hsiToRgb", "hsvToRgb", "hslToRgb"];
-				$col = Color::makeSuggestion($c, $cBg, 
+				if ($pair) {
+					$cols = Color::pairSuggestion($c, $cBg, 
+					$luminances[$i], $saturations[$i],
+					$bgLuminances[$i], $bgSaturations[$i],
+					$conFunctions[$i], $sat);
+					if (gettype($cols) == "array")
+						array_push($colors, $cols);
+				} else {
+					$col = Color::makeSuggestion($c, $cBg, 
 					$luminances[$i], $saturations[$i], $conFunctions[$i], $sat);
-				if ($col != null) {
-					array_push($colors, $col);
+					if ($col != null) 
+						array_push($colors, $col);
 				}
 			}
 		}
