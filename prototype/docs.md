@@ -26,10 +26,10 @@ Color::fromHex(string $hex) -> Color
 Maakt een kleur-object aan op basis van een hexadecimale string. B.v "#0dde65".
 
 ```php
-Color::function hslToRgb(float $h, float $s, float $l) -> [$r, $g, $b]
-Color::function hsiToRgb(float $h, float $s, float $i) -> [$r, $g, $b]
-Color::function hsvToRgb(float $h, float $s, float $v) -> [$r, $g, $b]
-Color::function hclToRgb(float $h, float $c, float $l) -> [$r, $g, $b]
+Color::hslToRgb(float $h, float $s, float $l) -> [$r, $g, $b]
+Color::hsiToRgb(float $h, float $s, float $i) -> [$r, $g, $b]
+Color::hsvToRgb(float $h, float $s, float $v) -> [$r, $g, $b]
+Color::hclToRgb(float $h, float $c, float $l) -> [$r, $g, $b]
 ```
 Berekent r, g en b-waarden vanuit een andere kleurruimte. Parameters tussen de
 0 en 1.
