@@ -8,12 +8,16 @@ De `color` class is er om tussen kleurruimtes te rekenen.
 - HSV ($hue, $hsv_saturation, $value)
 - HCL ($hue, $chroma, $luma)
 
+Opmerkingen:
 * Alle attributen worden als getal van 0-1 opgeslagen.
-* Het H-attribuut is bij elke kleurruimte hetzelfde
+* Het H-attribuut is bij elke kleurruimte hetzelfde.
 * Het S-attribuut van HSL, HSI en HSV heet bij elke officiëel "saturation" maar
 het wordt per kleurruimte anders berekend.
 
 ## Conversie
+Bij de voorbeelden hieronder moet je `Color` leterlijk over kopiëren, dit zijn
+statische functies. `$col` refereert naar een bestaande variabele met de
+Color-class.
 ```php
 Color::fromRgb(float $r, float $g, float $b) -> Color
 ```
@@ -46,7 +50,7 @@ $col->toString() -> string
 Maakt een rgb-string. B.v. "rgb(12, 204, 144)"
 
 ```php
-$col->toString() -> string
+$col->toHex() -> string
 ```
 Maakt een hexadecimale string. B.v. "#0dde65"
 
