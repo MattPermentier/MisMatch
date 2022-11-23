@@ -16,10 +16,6 @@ require_once("color.php");
 require_once("read-theme.php");
 
 function misMatch() {
-	$theme = Theme::get();
-	$bg = $theme->styles->color->background;
-	$fg = $theme->styles->color->text;
-	echo "succesful theme.json read! Text: (" . $fg . ") Background: (" . $bg . ")";
 }
 
 add_action("admin_notices", "misMatch");
