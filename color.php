@@ -96,7 +96,7 @@ class Color {
 
 	public static function fromHex(string $hex) {
 		$rgb = sscanf($hex, "#%02x%02x%02x");
-		return Color::from($rgb[0] / 255, $rgb[1] / 255, $rgb[2] / 255);
+		return Color::fromRgb($rgb[0] / 255, $rgb[1] / 255, $rgb[2] / 255);
 	}
 
 	public static function luminanceColor(float $c) {
