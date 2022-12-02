@@ -190,7 +190,6 @@ class Theme {
 		$bg = $this->getColorValue($bgRaw);
 		$txtCol = Color::fromHex($txt);
 		$bgCol = Color::fromHex($bg);
-		echo " | bg: " . $bg . " (" . $bgRaw . ") - text: " . $txt . " (" . $txtRaw . ") <br>";
 		return Color::contrast($txtCol->luminance(), $bgCol->luminance());
 	}
 
@@ -199,7 +198,6 @@ class Theme {
 		$meh = [];
 		$bad = [];
 		foreach ($this->textColors as $c => $txt) {
-			echo $c;
 			$bg = Theme::getColor($this->backgroundColors, $c);
 			$contrast = $this->checkColorContrast($txt, $bg);
 			if ($contrast > 7) {
@@ -211,7 +209,6 @@ class Theme {
 			}
 		}
 		foreach ($this->backgroundColors as $c => $bg) {
-			echo $c;
 			$txt = Theme::getColor($this->textColors, $c);
 			$this->checkColorContrast($txt, $bg);
 			$contrast = $this->checkColorContrast($txt, $bg);
@@ -235,22 +232,47 @@ class Theme {
 		]];
 	}
 
+	// doesn't work if colors are identical
 	function suggest($bad) {
 		$suggestions = [];
 		foreach ($bad as $sel) {
 			$txt = Theme::getColor($this->textColors, $sel);
 			$bg = Theme::getColor($this->backgroundColors, $sel);
-			$suggs = Color::suggestColors(
-				Color::fromHex(Theme::getColorValue($txt)),
-				Color::fromHex(Theme::getColorValue($bg)),
-				false);
-			echo $sel;
-			var_dump($suggs);
+			$txtCol = Color::fromHex(Theme::getColorValue($txt));
+			$bgCol = Color::fromHex(Theme::getColorValue($bg));
+			$suggestions[$sel] = [];
+			$txtSuggs = Color::suggestColors($txtCol, $bgCol, false);
+			if ($txtSuggs != []) $suggestions[$sel]["txt"] = $txtSuggs;
+			$bgSuggs = Color::suggestColors($bgCol, $txtCol, false);
+			if ($bgSuggs != []) $suggestions[$sel]["bg"] = $bgSuggs;
+			$pairSuggs = Color::suggestColors($txtCol, $bgCol, true);
+			if ($pairSuggs != []) $suggestions[$sel]["pair"] = $pairSuggs;
+			
 		}
 		return $suggestions;
 	}
 }
 
+// returns an array of suggestions
+// 	[css selector] => {
+// 		[txt] => array(colors), 
+// 		[bg] => array(colors), 
+// 		[pair] => array(colors)
+// 	}
+function getSuggestions() {
+	$theme = Theme::get();
+	$contrast = $theme->checkContrast();
+	$suggestionsRaw = $theme->suggest($contrast["bad"]);
+	$suggestions = [];
+	foreach ($suggestionsRaw as $selector => $values) {
+		$sel = str_replace('@', ' ', $selector);
+		$sel = str_replace('~', '', $sel);
+		$suggestions[$sel] = $values;
+	}
+	return $suggestions;
+}
+
+// debugging function
 function dumpTheme() {
 	$theme = Theme::get();
 	$contrast = $theme->checkContrast();
@@ -264,7 +286,7 @@ function dumpTheme() {
 		$contrast["count"]["total"] * 100 . "%";
 	echo "<br>Bad: " . $contrast["count"]["bad"] / 
 		$contrast["count"]["total"] * 100 . "%<br><br>";
-	var_dump($theme->suggest($contrast["bad"]));
+	print_r(getSuggestions());
 }
 
 add_action("admin_notices", "dumpTheme");
