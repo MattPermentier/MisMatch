@@ -11,6 +11,20 @@ Author: MisMatch
 Version: 0.0.1
 License: CC0
 */
+if( ! defined( 'ABSPATH') ) {
+    exit;
+}
+
+include_once('src/metabox.php');
+
+function myprefix_enqueue_assets() {
+    wp_enqueue_script(
+        'myprefix-gutenberg-sidebar',
+        plugins_url( 'build/index.js', __FILE__ ),
+        array( 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data' )
+    );
+}
+add_action( 'enqueue_block_editor_assets', 'myprefix_enqueue_assets' );
 
 require_once("color.php");
 require_once("read-theme.php");
@@ -28,4 +42,3 @@ function misMatch() {
 }
 
 add_action("admin_notices", "misMatch");
-
