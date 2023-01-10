@@ -286,8 +286,7 @@ function dumpTheme() {
 		$contrast["count"]["total"] * 100 . "%";
 	echo "<br>Bad: " . $contrast["count"]["bad"] / 
 		$contrast["count"]["total"] * 100 . "%<br><br>";
-	print_r(getSuggestions());
+	//echo json_encode(getSuggestions());
 }
 
 add_action("admin_notices", "dumpTheme");
-
