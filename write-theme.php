@@ -72,7 +72,7 @@ function addStyles() {
 	echo wp_enqueue_style("MisMatch", $url);
 }
 
-// e.g. ($styles, "body", "backgroundColor", "#f2eef6")
+// e.g. ($styles, "body", "background-color", "#f2eef6")
 function setThemeAttribute(&$styles, $selector, $attribute, $value) {
 	if (!array_key_exists($selector, $styles)) {
 		$styles[$selector] = [];

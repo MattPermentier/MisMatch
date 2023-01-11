@@ -14,7 +14,6 @@ if( ! defined( 'ABSPATH') ) {
 include_once('src/metabox.php');
 
 function myprefix_enqueue_assets() {
-	echo "HI MISSMATCH";
     wp_enqueue_script(
         'myprefix-gutenberg-sidebar',
         plugins_url( 'build/index.js', __FILE__ ),
