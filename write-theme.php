@@ -4,8 +4,10 @@ function makeSelector($values) {
 	$vals = [];
 	foreach ($values as $v) {
 		$attr = $v->attribute;
+		$old = "#0000";
+		if ($v->old) $old = $v->old;
 		$vals[$attr] = [
-		"old" => $v->old, 
+		"old" => $old, 
 		"new" => $v->new];
 	}
 	return $vals;
@@ -57,6 +59,8 @@ function makeStylesheet($styles) {
 	echo "<br>";
 	$cssStr = "";
 	foreach ($styles as $sel => $vals) {
+		$sel = str_replace("core/", ".wp-block-", $sel);
+		$sel = str_replace("default", "body", $sel);
 		$cssStr .= $sel . " {\n";
 		foreach ($vals as $attr => $v) {
 			$cssStr .= "\t" . $attr . ": " . $v['new'] . ";\n";
@@ -79,6 +83,7 @@ function setThemeAttribute(&$styles, $selector, $attribute, $value) {
 	}
 	$attr = ["new" => $value];
 	$css = parseCSS(wp_get_global_stylesheet());
+	$attr["old"] = "#0000";
 	if (array_key_exists($selector, $css)) {
 		$attr["old"] = $css[$selector][$attribute];
 	}

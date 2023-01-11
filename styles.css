@@ -1,3 +1,16 @@
 body {
-	background-color: #ff0000;
+	color: #525252;
+	background-color: #ffffff;
+}
+link {
+	color: #9e1d1d;
+	background-color: #ffffff;
+}
+h1 {
+	color: #525252;
+	background-color: #ffffff;
+}
+.wp-block-post-title {
+	color: #525252;
+	background-color: #ffffff;
 }

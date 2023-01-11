@@ -43,6 +43,8 @@ function misMatch() {
 	echo "<br><br>";
 	setThemeAttribute($styles, "body", "color", "ff0000");
 	print_r($styles);
+	echo "<br><br>";
+	print_r(wp_get_global_stylesheet());
 	echo "<br>";
 }
 
@@ -50,22 +52,43 @@ function changeTheme() {
 	$ssh = readStyles();
 	print_r($ssh);
 	echo "<br><br>";
-	setThemeAttribute($ssh, "body", "background-color", "#ff0000");
+	$suggs = getSuggestions();
+	foreach ($suggs as $selector => $values) {
+		foreach ($values as $type => $colors) {
+			$c = $colors[0];
+			if ($type == "txt") {
+			print_r($c);
+				setThemeAttribute($ssh, $selector, "color", $c->toHex());
+			} else if ($type == "bg") {
+				setThemeAttribute($ssh, $selector, "background-color", $c->toHex());
+			} else {
+				setThemeAttribute($ssh, $selector, "color", $c[0]->toHex());
+				setThemeAttribute($ssh, $selector, "background-color", $c[1]->toHex());
+			}
+		}
+	}
+	echo "<br><br>";
 	print_r($ssh);
 	saveStyles($ssh);
-	/*
-	print_r($ssh);
-	$ssheet = makeStylesheet($ssh);
-	echo "<br><br>";
-	print_r($ssheet);
-	saveStylesheet($ssheet);
-	*/
-	echo "SUCCES";
 	wp_die("hi", 200);
 }
 
 function suggestJson() {
-	echo wp_json_encode(getSuggestions());
+	$suggs = getSuggestions();
+	foreach ($suggs as $selector => $values) {
+		foreach ($values as $type => $colors) {
+			foreach ($colors as $ci => $c) {
+				if ($type == "pair") {
+					foreach ($c as $i => $cc) {
+						$suggs[$selector][$type][$ci][$i] = $cc->toHex();
+					}
+				} else {
+					$suggs[$selector][$type][$ci] = $c->toHex();
+				}
+			}
+		}
+	}
+	echo wp_json_encode($suggs);
 	wp_die("", 200);
 }
 
