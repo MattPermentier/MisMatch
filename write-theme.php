@@ -30,20 +30,6 @@ function readStyles() {
 		$mm_theme[$selector] = makeSelector($values);
 	}
 	$css = parseCSS(wp_get_global_stylesheet());
-	foreach ($css as $selector => $values) {
-		$selector = trimSelector($selector);
-		$mmsel = selToWp($selector);
-		if (array_key_exists($mmsel, $mm_theme)) {
-			$sel = $mm_theme[$mmsel];
-			foreach ($values as $attr => $v) {
-				if (array_key_exists($attr, $sel)) {
-					if ($sel[$attr]["old"] != $v) {
-						$mm_theme[$selector][$attr]["new"] = $v;
-					}
-				}
-			}
-		}
-	}
 	return $mm_theme;
 }
 
@@ -95,7 +81,6 @@ function setThemeAttribute(&$styles, $selector, $attribute, $value) {
 	$attr = ["new" => $value];
 	$css = parseCSS(wp_get_global_stylesheet());
 	$attr["old"] = "empty";
-	$selector = selToWp(trimSelector($selector));
 	if (array_key_exists($selector, $css)) {
 		$attr["old"] = $css[$selector][$attribute];
 	}
