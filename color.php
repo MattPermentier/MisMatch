@@ -9,18 +9,18 @@
 class Color {
 	// attributes are a floating point number 0-1
 	// simplifies conversions as opposed to 0-255
-	public readonly float $red;
-	public readonly float $green;
-	public readonly float $blue;
-	public readonly float $hue;
-	public readonly float $hsl_saturation;
-	public readonly float $hsv_saturation;
-	public readonly float $hsi_saturation;
-	public readonly float $light;
-	public readonly float $value;
-	public readonly float $intensity;
-	public readonly float $chroma;
-	public readonly float $luma;
+	public $red;
+	public $green;
+	public $blue;
+	public $hue;
+	public $hsl_saturation;
+	public $hsv_saturation;
+	public $hsi_saturation;
+	public $light;
+	public $value;
+	public $intensity;
+	public $chroma;
+	public $luma;
 
 	public function __construct(float $r, float $g, float $b, float $h, float $c, 
 		float $lm, float $l, float $v, float $i,
