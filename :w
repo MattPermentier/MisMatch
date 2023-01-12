@@ -37,7 +37,6 @@ function selToWp($sel) {
 	$sel = str_replace(".wp-block-", "core/", $sel);
 	$sel = str_replace("body", "default", $sel);
 	$sel = str_replace("a", "link", $sel);
-	return $sel;
 }
 
 function getKey($arr, $key) {
@@ -93,7 +92,8 @@ function parseCSS($css) {
 }
 
 function getStyle($styles, $selector, $attr) {
-	
+	if ($attr == "color")
+		return "#ff0000";
 	return "none";
 }
 
@@ -117,8 +117,9 @@ class Theme {
 	public static function get() {
 		$styles = wp_get_global_styles();
 		$mm_styles = readStyles();
-		$txtc = getStyle($mm_styles, "default", "color");
-		$bgc = getStyle($mm_styles, "default", "background-color");
+		print_r($mm_styles);
+		$txtc = getStyle($mm_styles, "body", "color");
+		$bgc = getStyle($mm_styles, "body", "background-color");
 		if (array_key_exists("color", $styles)) {
 			if ($txtc == "none") $txtc = $styles["color"]["text"];
 			$txt = ["default" => $txtc];
@@ -300,7 +301,16 @@ function dumpTheme() {
 	$theme = Theme::get();
 	$contrast = $theme->checkContrast();
 	var_dump($theme->textColors);
+	echo "<br>";
 	var_dump($theme->backgroundColors);
+	echo "<br>";
+	echo "<br>Good: " . $contrast["count"]["good"] / 
+		$contrast["count"]["total"] * 100 . "%";
+	echo "<br>Ok: " . $contrast["count"]["meh"] / 
+		$contrast["count"]["total"] * 100 . "%";
+	echo "<br>Bad: " . $contrast["count"]["bad"] / 
+		$contrast["count"]["total"] * 100 . "%<br><br>";
+	//echo json_encode(getSuggestions());
 }
 
 add_action("admin_notices", "dumpTheme");

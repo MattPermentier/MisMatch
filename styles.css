@@ -1,16 +1,27 @@
 body {
-	color: #525252;
-	background-color: #ffffff;
 }
-link {
-	color: #9e1d1d;
-	background-color: #ffffff;
+default {
+	background-color: #a60000;
+}
+a {
+	color: #ffdf09;
+	background-color: #880000;
 }
 h1 {
-	color: #525252;
-	background-color: #ffffff;
+	background-color: #a60000;
+}
+heading {
+}
+heading {
+	color: #000000;
+	background-color: #ff6f6f;
 }
 .wp-block-post-title {
-	color: #525252;
-	background-color: #ffffff;
+	background-color: #a60000;
+}
+body {
+	background-color: var(--wp--preset--color--base);
+}
+a {
+	color: var(--wp--preset--color--primary);
 }

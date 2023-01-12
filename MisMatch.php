@@ -18,8 +18,7 @@ if( ! defined( 'ABSPATH') ) {
 include_once('src/metabox.php');
 
 function myprefix_enqueue_assets() {
-	echo (
-	"<script>
+	echo ("<script>
 		const ajax_url = '" . admin_url("admin-ajax.php") . "';
 	</script>");
 	wp_enqueue_script(
@@ -39,37 +38,26 @@ function misMatch() {
 	saveStyles($styles);
 	$sheet = makeStylesheet($styles);
 	saveStylesheet($sheet);
-	print_r($styles);
-	echo "<br><br>";
 	setThemeAttribute($styles, "body", "color", "ff0000");
-	print_r($styles);
-	echo "<br><br>";
-	print_r(wp_get_global_stylesheet());
-	echo "<br>";
 }
 
 function changeTheme() {
-	$ssh = readStyles();
-	print_r($ssh);
-	echo "<br><br>";
+	$css = [];
 	$suggs = getSuggestions();
 	foreach ($suggs as $selector => $values) {
 		foreach ($values as $type => $colors) {
 			$c = $colors[0];
 			if ($type == "txt") {
-			print_r($c);
-				setThemeAttribute($ssh, $selector, "color", $c->toHex());
+				setThemeAttribute($css, $selector, "color", $c->toHex());
 			} else if ($type == "bg") {
-				setThemeAttribute($ssh, $selector, "background-color", $c->toHex());
+				setThemeAttribute($css, $selector, "background-color", $c->toHex());
 			} else {
-				setThemeAttribute($ssh, $selector, "color", $c[0]->toHex());
-				setThemeAttribute($ssh, $selector, "background-color", $c[1]->toHex());
+				setThemeAttribute($css, $selector, "color", $c[0]->toHex());
+				setThemeAttribute($css, $selector, "background-color", $c[1]->toHex());
 			}
 		}
 	}
-	echo "<br><br>";
-	print_r($ssh);
-	saveStyles($ssh);
+	saveStyles($css);
 	wp_die("hi", 200);
 }
 
@@ -88,7 +76,32 @@ function suggestJson() {
 			}
 		}
 	}
-	echo wp_json_encode($suggs);
+	wp_die("", 200);
+}
+
+function adaptTheme() {
+	$css = readStyles();
+	if (!array_key_exists("suggestions", $_REQUEST)) {
+		wp_die("No suggestions", 400);
+	}
+	$suggestions = getSuggestions();
+	foreach (explode(" ", $_REQUEST["suggestions"]) as $sug) {
+		$sug = explode("_", $sug);
+		$selector = $sug[0];
+		$colorType = $sug[1];
+		$color = $sug[2];
+		if ($colorType == "pair") {
+			$c = $suggestions[$selector][$colorType][$color];
+			$txtc = $c[0]->toHex();
+			$bgc = $c[1]->toHex();
+			setThemeAttribute($css, $selector, "color", $txtc);
+			setThemeAttribute($css, $selector, "background-color", $bgc);
+		} else {
+			$c = $suggestions[$selector][$colorType][$color]->toHex();
+			setThemeAttribute($css, $selector, $colorType, $c);
+		}
+	}
+	saveStyles($css);
 	wp_die("", 200);
 }
 
@@ -96,5 +109,9 @@ add_action('wp_ajax_missmatch', 'changeTheme');
 add_action('wp_ajax_nopriv_missmatch', 'changeTheme');
 
 add_action('wp_ajax_get_suggestions', 'suggestJson');
+add_action('wp_ajax_nopriv_get_suggestions', 'suggestJson');
+
+add_action('wp_ajax_give_suggestion', 'adaptTheme');
+add_action('wp_ajax_nopriv_give_suggestion', 'adaptTheme');
 
 add_action("admin_notices", "misMatch");

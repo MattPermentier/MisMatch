@@ -4,7 +4,7 @@ function makeSelector($values) {
 	$vals = [];
 	foreach ($values as $v) {
 		$attr = $v->attribute;
-		$old = "#0000";
+		$old = "empty";
 		if ($v->old) $old = $v->old;
 		$vals[$attr] = [
 		"old" => $old, 
@@ -13,21 +13,32 @@ function makeSelector($values) {
 	return $vals;
 }
 
+function trimSelector($sel) {
+	$sel = explode(":", $sel)[0];
+	$sel = explode(">", $sel)[0];
+	return $sel;
+}
+
 function readStyles() {
-	$path = plugin_dir_path(__FILE__);
-	$json = json_decode(file_get_contents($path . "mm_styles.json"));
+	$path = plugin_dir_path(__FILE__) . "mm_styles.json";
+	if (!file_exists($path)) {
+		return [];
+	}
+	$json = json_decode(file_get_contents($path));
 	$mm_theme = [];
 	foreach ($json as $selector => $values) {
 		$mm_theme[$selector] = makeSelector($values);
 	}
 	$css = parseCSS(wp_get_global_stylesheet());
 	foreach ($css as $selector => $values) {
-		if (array_key_exists($selector, $mm_theme)) {
-			$sel = $mm_theme[$selector];
+		$selector = trimSelector($selector);
+		$mmsel = selToWp($selector);
+		if (array_key_exists($mmsel, $mm_theme)) {
+			$sel = $mm_theme[$mmsel];
 			foreach ($values as $attr => $v) {
 				if (array_key_exists($attr, $sel)) {
 					if ($sel[$attr]["old"] != $v) {
-						unset($mm_theme[$selector][$attr]);
+						$mm_theme[$selector][$attr]["new"] = $v;
 					}
 				}
 			}
@@ -56,11 +67,9 @@ function saveStylesheet($sheet) {
 }
 
 function makeStylesheet($styles) {
-	echo "<br>";
 	$cssStr = "";
 	foreach ($styles as $sel => $vals) {
-		$sel = str_replace("core/", ".wp-block-", $sel);
-		$sel = str_replace("default", "body", $sel);
+		$sel = selToCss($sel);
 		$cssStr .= $sel . " {\n";
 		foreach ($vals as $attr => $v) {
 			$cssStr .= "\t" . $attr . ": " . $v['new'] . ";\n";
@@ -73,17 +82,20 @@ function makeStylesheet($styles) {
 function addStyles() {
 	saveStylesheet(makeStylesheet(readStyles()));
 	$url = plugins_url("styles.css", __FILE__);
-	echo wp_enqueue_style("MisMatch", $url);
+	wp_enqueue_style("MisMatch", $url);
 }
 
 // e.g. ($styles, "body", "background-color", "#f2eef6")
 function setThemeAttribute(&$styles, $selector, $attribute, $value) {
+	if ($attribute == "txt") $attribute = "color";
+	if ($attribute == "bg") $attribute = "background-color";
 	if (!array_key_exists($selector, $styles)) {
 		$styles[$selector] = [];
 	}
 	$attr = ["new" => $value];
 	$css = parseCSS(wp_get_global_stylesheet());
-	$attr["old"] = "#0000";
+	$attr["old"] = "empty";
+	$selector = selToWp(trimSelector($selector));
 	if (array_key_exists($selector, $css)) {
 		$attr["old"] = $css[$selector][$attribute];
 	}
