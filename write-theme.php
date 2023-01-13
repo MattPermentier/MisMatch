@@ -81,6 +81,7 @@ function setThemeAttribute(&$styles, $selector, $attribute, $value) {
 	$attr = ["new" => $value];
 	$css = parseCSS(wp_get_global_stylesheet());
 	$attr["old"] = "empty";
+	$selector = selToWp(trimSelector($selector));
 	if (array_key_exists($selector, $css)) {
 		$attr["old"] = $css[$selector][$attribute];
 	}
