@@ -56,3 +56,4 @@ Maakt een hexadecimale string. B.v. "#0dde65"
 
 ## Bronnen
 [Conversie Kleuren](https://en.wikipedia.org/wiki/HSL_and_HSV#Luma,_chroma_and_hue_to_RGB)
+

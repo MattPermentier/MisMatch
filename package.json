@@ -1,0 +1,22 @@
+{
+  "name": "gutenberg-sidebar",
+  "version": "1.0.0",
+  "description": "Deze map bevat de broncode van de plug-in. Om het op WordPress te installeren moet je het geheel in `/wordpress/wp-content/plugins` plaatsen. Vervolgens kun je in de WordPress interface naar Plugins gaan en \"MisMatch\" activeren.",
+  "main": "index.js",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@wordpress/scripts": "^25.1.0"
+  },
+  "dependencies": {
+    "@wordpress/components": "^23.1.0",
+    "@wordpress/data": "^8.1.0",
+    "@wordpress/edit-post": "^7.1.0",
+    "@wordpress/i18n": "^4.24.0",
+    "@wordpress/plugins": "^5.1.0"
+  }
+}

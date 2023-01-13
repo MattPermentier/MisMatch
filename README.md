@@ -1,5 +1,6 @@
-# MisMatch
+# MissMatch
 ## Installatie
-Deze map bevat de broncode van de plug-in. Om het op WordPress te installeren
-moet je het geheel in `/wordpress/wp-content/plugins` plaatsen. Vervolgens kun
-je in de WordPress interface naar Plugins gaan en "MisMatch" activeren.
+Deze GitHub repository bevat de broncode van de MissMatch WordPress plug-in. Om dit op WordPress te
+installeren moet de gehele folder in `wp-content/plugins` worden geplaatst. Vervolgens moet je via
+WordPress naar "Plugins -> Installed" Plugins gaan. Hier staat dan de "MissMatch" plug-in tussen,
+klik hier op "Activate".

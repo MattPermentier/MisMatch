@@ -1,0 +1,53 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	background-color: #888;
+	margin: 0;
+	font-family: "sans-serif";
+}
+
+main { 
+	width: 70%;
+	padding: 16px;
+	float: left;
+	background-color: var(--bg-color);
+	color: var(--text-color);
+}
+
+aside {
+	width: 30%;
+	padding: 8px;
+	float: right;
+	background-color: #6cd;
+}
+
+table {
+	border-spacing: 0;
+	font-size: 14px;
+	color: var(--text-color);
+}
+
+.table-wrapper {
+	display: flex;
+	justify-content: space-evenly;
+}
+
+table td, table th {
+	min-width: 40px; height: 1px; margin: 0;
+}
+
+.suggestion-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.suggestion {
+	width: 80px;
+	height: 80px;
+	border-radius: 8px;
+	margin: 4px;
+	cursor: pointer;
+}
+
